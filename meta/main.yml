@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Agraqqa
+  namespace: agraqqa
+  role_name: opcli
+  description: Role to install 1Password CLI (op)
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - "jammy"
+        - "noble"
+    - name: Debian
+    - name: EL
+    - name: Alpine
+  galaxy_tags: []
+dependencies: []

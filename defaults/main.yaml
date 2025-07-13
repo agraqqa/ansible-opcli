@@ -1,0 +1,38 @@
+---
+
+# defaults file for ansible-opcli
+
+# 1Password CLI repository (Debian/Ubuntu)
+repo_arch: ""
+op_repo: >-
+  deb [arch={{ repo_arch }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg]
+  https://downloads.1password.com/linux/debian/{{ repo_arch }} stable main
+op_repo_key: "https://downloads.1password.com/linux/keys/1password.asc"
+op_repo_state: present
+
+# Direct .deb install support
+op_cli_deb_url: "https://downloads.1password.com/linux/debian/{{ repo_arch }}/stable/1password-cli-{{ repo_arch }}-latest.deb"
+op_cli_deb_path: "/tmp/1password-cli-{{ repo_arch }}-latest.deb"
+
+# 1Password CLI repository (YUM/RPM)
+rpm_arch: ""
+op_rpm_repo_url: "https://downloads.1password.com/linux/rpm/stable/$basearch"
+op_rpm_key_url: "https://downloads.1password.com/linux/keys/1password.asc"
+op_rpm_repo_file: "/etc/yum.repos.d/1password.repo"
+op_cli_rpm_url: "https://downloads.1password.com/linux/rpm/stable/{{ rpm_arch }}/1password-cli-latest.{{ rpm_arch }}.rpm"
+op_cli_rpm_path: "/tmp/1password-cli-latest.{{ rpm_arch }}.rpm"
+
+# 1Password CLI repository (Alpine)
+op_alpine_repo: "https://downloads.1password.com/linux/alpinelinux/stable/"
+op_alpine_key_url: "https://downloads.1password.com/linux/keys/alpinelinux/support@1password.com-61ddfc31.rsa.pub"
+
+# 1Password integration
+op_inject_user: ""
+op_service_account_token: ""
+op_inject_path: "/home/{{ op_inject_user }}/.op"
+
+# Install method: "repo" (default, repository), "deb" (download .deb), "none" (skip install)
+op_cli_install_method: "repo"
+
+# Uninstall 1Password CLI if true
+op_cli_absent: false

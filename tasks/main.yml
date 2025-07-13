@@ -1,0 +1,47 @@
+---
+# tasks file for ansible-opcli
+
+# Auto-detect architecture if not set (Debian/Ubuntu and RPM)
+- name: Set repo_arch and rpm_arch based on system architecture
+  ansible.builtin.set_fact:
+    repo_arch: >-
+      {% if repo_arch | length > 0 %}{{ repo_arch }}
+      {% elif ansible_architecture == 'x86_64' %}amd64
+      {% elif ansible_architecture == 'aarch64' %}arm64
+      {% elif ansible_architecture == 'armv7l' %}arm
+      {% elif ansible_architecture == 'i386' %}386
+      {% else %}amd64{% endif %}
+    rpm_arch: >-
+      {% if rpm_arch | length > 0 %}{{ rpm_arch }}
+      {% elif ansible_architecture == 'x86_64' %}x86_64
+      {% elif ansible_architecture == 'aarch64' %}aarch64
+      {% elif ansible_architecture == 'armv7l' %}armv7l
+      {% elif ansible_architecture == 'i386' %}i386
+      {% else %}x86_64{% endif %}
+  tags: [always]
+
+# Include OS-specific install tasks
+- name: Include Debian/Ubuntu tasks
+  ansible.builtin.include_tasks: debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Include RedHat/CentOS tasks
+  ansible.builtin.include_tasks: redhat.yml
+  when: ansible_os_family == 'RedHat' or ansible_os_family == 'EL'
+
+- name: Include Alpine tasks
+  ansible.builtin.include_tasks: alpine.yml
+  when: ansible_os_family == 'Alpine'
+
+# Optionally inject OP_SERVICE_ACCOUNT_TOKEN for a user
+- name: Generate op secret file
+  ansible.builtin.copy:
+    dest: "{{ op_inject_path }}"
+    content: |
+      {{ op_service_account_token }}
+    mode: u=rw,g=,o=
+    owner: "{{ op_inject_user }}"
+    group: "{{ op_inject_user }}"
+  when: op_inject_user | length > 0 and op_service_account_token | length > 0 and op_inject_path | length > 0
+  tags: [config]
+  no_log: true

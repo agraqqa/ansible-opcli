@@ -1,0 +1,61 @@
+---
+# Debian/Ubuntu: .deb or repo install
+- name: Download 1Password CLI .deb (Debian/Ubuntu)
+  ansible.builtin.get_url:
+    url: "{{ op_cli_deb_url }}"
+    dest: "{{ op_cli_deb_path }}"
+    mode: '0644'
+  when: op_cli_install_method is defined and op_cli_install_method == "deb"
+  tags: [install]
+
+- name: Install 1Password CLI .deb (Debian/Ubuntu)
+  ansible.builtin.apt:
+    deb: "{{ op_cli_deb_path }}"
+    state: present
+  when: op_cli_install_method is defined and op_cli_install_method == "deb"
+  tags: [install]
+
+- name: Add the 1Password repository key using apt_key (Debian/Ubuntu)
+  ansible.builtin.apt_key:
+    url: "{{ op_repo_key }}"
+    state: present
+    keyring: /usr/share/keyrings/1password-archive-keyring.gpg
+  become: true
+  when: op_cli_install_method == "repo"
+  tags: [repo]
+
+- name: Add the 1Password APT repository (Debian/Ubuntu)
+  ansible.builtin.apt_repository:
+    repo: "{{ op_repo }}"
+    state: "{{ op_repo_state }}"
+    update_cache: true
+    filename: 1password
+  become: true
+  when: op_cli_install_method == "repo"
+  tags: [repo]
+
+- name: Install 1Password CLI (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name: 1password-cli
+    state: present
+    update_cache: true
+  become: true
+  when: op_cli_install_method == "repo"
+  tags: [install]
+
+- name: Uninstall 1Password CLI (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name: 1password-cli
+    state: absent
+    purge: true
+    update_cache: true
+  become: true
+  when: op_cli_absent | bool
+  tags: [uninstall]
+
+- name: Remove 1Password CLI .deb file (if present)
+  ansible.builtin.file:
+    path: "{{ op_cli_deb_path }}"
+    state: absent
+  when: op_cli_absent | bool
+  tags: [uninstall]

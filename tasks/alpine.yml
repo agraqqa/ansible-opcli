@@ -1,0 +1,32 @@
+---
+# Alpine: repo install only
+- name: Add 1Password Alpine repo
+  ansible.builtin.lineinfile:
+    path: /etc/apk/repositories
+    line: "{{ op_alpine_repo }}"
+    state: present
+  become: true
+  tags: [repo]
+
+- name: Add 1Password Alpine key
+  ansible.builtin.get_url:
+    url: "{{ op_alpine_key_url }}"
+    dest: "/etc/apk/keys/$(basename {{ op_alpine_key_url }})"
+    mode: '0644'
+  become: true
+  tags: [repo]
+
+- name: Install 1Password CLI (Alpine)
+  community.general.apk:
+    name: 1password-cli
+    state: present
+  become: true
+  tags: [install]
+
+- name: Uninstall 1Password CLI (Alpine)
+  community.general.apk:
+    name: 1password-cli
+    state: absent
+  become: true
+  when: op_cli_absent | bool
+  tags: [uninstall]
