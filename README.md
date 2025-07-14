@@ -2,10 +2,6 @@
 
 `ansible-opcli` is an Ansible role which deploys 1Password client (`op`) on a host
 
-# Requirements
-
-Ubuntu 22.04 tested
-
 # Role Variables
 
 | Variable | Default | Description |
